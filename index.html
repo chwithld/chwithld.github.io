@@ -3,18 +3,78 @@
   <body>
     <h1>我叫<span id="myname">.</h1>
      <p>我的学号是<span id="mynumber"></span>
+      <button id="btn">下一个</button>
+      <a id="alogin" href="./login.html">去登陆</a>
+      <a id="alogout" href="#">去注销</a>
+     </p>
+     <p>
+      <input type="text" id="content">
+      <input type="button" value="添加" id="btnAdd">
+      <ul id="lvli">
+
+      </ul>
      </p>
     <img src="./matrix.png" id="logo"  style="border-radius: 10px 20px 30px 40px"/><br>
     <img src="./xiaomao.jpg" id="mao" width="350px" height="350px" style="border-radius: 40px 30px 20px 10px"/>
     <script src="./jquery-3.4.1.js"></script>
     <script>
         $(function(){
-          $.get("./data.json",function(result){
+          var callback=function(result){
+            if(!result || !result.myname){
+                    $("#alogout").hide();
+                    $("#content").hide();
+                    $("#btnAdd").hide();
+                    $("#lvli").hide();
+                }else{
+                    $("#myname").text(result.myname);
+                    $("#mynumber").text(result.mynumber);
+                    $("#alogin").hide();
+                }
+          }
+          $.ajax({
+            type: "POST",
+            //url:"http://127.0.0.1:8585/data.json",
+            url:"http://127.0.0.1:8585/userinfo",
+            xhrFields:{
+                        withCredentials:true,
+                    },
+            //contentType:"application/json",
+            //data:"stunumber=18002090120",
+            success:callback,
+          });
+         // $.post("http://127.0.0.1:8585/data.json",{stunumber:"18002090120"},callback);
+        });
+        $.get("http://127.0.0.1:8585/lvlilist",function(result){
+              for(var i = 0 ; i<result.length;i++){
+                $("#lvli").append("<li>"+result[i]+"</li>");
+              }
+          });  
+        $("#alogout").click(function(){
+                $.ajax({
+                type:"POST",
+                xhrFields: {
+                        withCredentials: true
+                },
+                url:"http://127.0.0.1:8585/logout",
+                success:function(){
+                    location.href="index.html";
+                }
+             });
+        });
+        $("#btnAdd").click(function(){
+          $.post("http://127.0.0.1:8585/addlvli",{lvli:$("#content").val()},function(){
+            location.href="index.html";
+          });
+        });
+        $("#btn").click(function(){
+          $.get("http://10.30.201.84:8585/data.json",function(result){
             $("#myname").text(result.myname);
             $("#mynumber").text(result.mynumber);
           });
         })
-
+        
+        
+        
     </script>
   </body>
 </html>
